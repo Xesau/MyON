@@ -1,0 +1,91 @@
+<?php
+
+namespace Xesau\MyON;
+
+abstract class Query {
+	
+	protected $mainWhereGroup = null;
+	protected $orderRules = [];
+	
+	protected $offset = false;
+	protected $limit = false;
+	
+	public function where($field, $operator, $value) {
+		$newGroup = new WhereGroup($field, $operator, $value, $this);
+		if ($this->mainWhereGroup == null) {
+			$this->mainWhereGroup = $newGroup;
+		} else {
+			$this->mainWhereGroup = new WhereGroup($this->mainWhereGroup, $newGroup);
+		}
+        return $this->mainWhereGroup;
+	}
+	
+	public function asc($field) {
+		$this->orderRules[] = new Order($field, 'asc');
+        return $this;
+	}
+	
+	public function desc($field) {
+		$this->orderRules[] = new Order($field, 'desc');
+        return $this;
+	}
+	
+	public function orderField($field, array $values) {
+		$this->orderRules[] = new OrderByField($field, $values);
+        return $this;
+	}
+    
+    /**
+     * Gets or sets the amount of rows offset in the result of this query.
+     * 
+     * @param int|bool|null $offset The amount of rows to be offset. To disable the offset, specify FALSE.
+     *                              To get the amount of rows to be offset, specify NULL.
+     * @return $this|int|bool If $offset is not specified, the currently set amount is returned, or FALSE
+     *                        is returned if no amount has been set. If $offset is specified, the
+     *                        current amount will be updated and the current object will be returned.
+     */
+    public function offset($offset = null) {
+        if ($offset === null)
+            return $this->offset;
+        
+        if ($offset !== false) {
+            if (is_int($offset)) {
+                if ($offset < 1) {
+                    throw new InvalidArgumentException('Query.limit $offset must be an integer greater than 0, or -1 to disable the limit.');
+                }
+            } else {
+                throw new InvalidArgumentException('Query.limit $offset is not an int or FALSE.');
+            }
+        }
+        
+        $this->offset = $offset;
+        return $this;
+    }
+
+    /**
+     * Gets or sets the limit of the result of this query.
+     * 
+     * @param int|bool|null $limit The limit to set. To disable the limit, specify FALSE. To get the limit, specify NULL.
+     * @return $this|int|bool If $limit is not specified, the currently set limit is returned, or FALSE
+     *                       is returned if a limit has not been set. If $limit is specified, the
+     *                       current limit will be updated and the current object will be returned.
+     */
+    public function limit($limit = null) {
+        if ($limit === null)
+            return $this->limit;
+        
+        if ($limit !== false) {
+            if (is_int($limit)) {
+                if ($limit < 1) {
+                    throw new InvalidArgumentException('Query.limit $limit must be an integer greater than 0, or -1 to disable the limit.');
+                }
+            } else {
+                throw new InvalidArgumentException('Query.limit $limit is not an int or FALSE.');
+            }
+        }
+        
+        $this->limit = $limit;
+        return $this;
+    }
+    
+}
