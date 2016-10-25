@@ -4,13 +4,17 @@ namespace Xesau\MyON;
 
 use PDO;
 use Iterator;
+use Countable;
+
 use RuntimeException;
 
 /**
  * Traversable MySQL SELECT
  */
-class Selection extends Query implements Iterator {
+class Selection extends Query implements Iterator, Countable {
 	
+    private $mode = 'select';
+    
 	private $oi;
 	private $destinationClass;
 	
@@ -45,7 +49,15 @@ class Selection extends Query implements Iterator {
     
 	public function __toString() {
 		// SELECT ... FROM ...
-		$sql = 'SELECT * FROM '. MyON::escapeField($this->oi->getTableName());
+        if ($this->mode == 'count') {
+            $sql = 'SELECT COUNT(*)';
+        } elseif ($this->mode == 'select') {
+            $sql = 'SELECT *';
+        } elseif ($this->mode == 'delete') {
+            $sql = 'DELETE';
+        }
+        
+        $sql .= ' FROM '. MyON::escapeField($this->oi->getTableName());
 		
 		// WHERE ...
 		if ($this->mainWhereGroup !== null) {
@@ -72,11 +84,31 @@ class Selection extends Query implements Iterator {
 		
 		return $sql;
 	}
-	
-	public function currentExtra() {
-		if (!$this->iterating)
-			$this->perform();
-	}
+    
+    /**
+     * Counts the amount of rows that would be retrieved from this query
+     *
+     * @return int The amount
+     */
+    public function count() {
+        $this->mode = 'count';
+        $stmt = MyON::getPDO()->query($this->__toString());
+        $stmt->execute();
+        $res = $stmt->fetch(PDO::FETCH_NUM);
+        return (int)$res[0];
+    }
+    
+    /** 
+     * Removes the selected rows
+     *
+     * @return int The amount of rows deleted
+     */
+    public function delete() {
+        $this->mode = 'delete';
+        $stmt = MyON::getPDO()->query($this->__toString());
+        $stmt->execute();
+        return $stmt->rowCount();
+    }
 	
 	public function current() {
 		if (!$this->iterating)
@@ -136,6 +168,7 @@ class Selection extends Query implements Iterator {
      * @param bool $loadObjects Whether to store the results as objects
      */
 	public function perform($loadObjects = true) {
+        $this->mode = 'select';
         $this->iterating = true;
         $this->results = [];
 		$stmt = MyON::getPDO()->query($this->__toString());

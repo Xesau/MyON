@@ -115,7 +115,7 @@ class MyON {
         
         if ($ref[0] == '~') {
             $ownNamespace = substr($own, 0, strrpos($own, '\\'));
-            return $ownNamespace . substr($ref, 1);
+            return $ownNamespace .'\\'. substr($ref, 1);
         }
     }
 }

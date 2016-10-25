@@ -10,14 +10,23 @@ abstract class Query {
 	protected $offset = false;
 	protected $limit = false;
 	
-	public function where($field, $operator, $value) {
-		$newGroup = new WhereGroup($field, $operator, $value, $this);
+    /** 
+     * Limits the selection to rows where the given field follows the given condition
+     * 
+     * @param string|string[] $field    The field that must follow the condition
+     * @param string          $operator The operator (=, !=, etc.)
+     * @param mixed|Selection $value    The value accompanying the operator
+     * @param bool            $continue Whether to continue with the newly created group
+     * @return $this|WhereGroup See param $continue
+     */
+	public function where($field, $operator, $value, $continue = false) {
 		if ($this->mainWhereGroup == null) {
-			$this->mainWhereGroup = $newGroup;
+			$this->mainWhereGroup = ($newGroup = new WhereGroup($field, $operator, $value, $this));
 		} else {
-			$this->mainWhereGroup = new WhereGroup($this->mainWhereGroup, $newGroup);
+			$newGroup = $this->mainWhereGroup->andWhere($field, $operator, $value);
 		}
-        return $this->mainWhereGroup;
+        
+        return $continue ? $newGroup : $this;
 	}
 	
 	public function asc($field) {

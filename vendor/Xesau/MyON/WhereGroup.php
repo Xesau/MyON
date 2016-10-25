@@ -31,14 +31,24 @@ class WhereGroup {
 		return $this;
 	}
 	
-	public function andGroup($field, $operator, $value) {
-		$group = new WhereGroup($field, $operator, $value, $this->query, $this);
+	public function andGroup($fieldOrGroup, $operator, $value) {
+		if ($fieldOrGroup instanceof WhereGroup) {
+            $group = $fieldOrGroup;
+        } else {    
+            $group = new WhereGroup($fieldOrGroup, $operator, $value, $this->query, $this);
+        }
+        
 		$this->elements[] = ['and', $group];
 		return $group;
 	}
 	
 	public function orGroup($field, $operator, $value) {
-		$group = new WhereGroup($field, $operator, $value, $this->query, $this);
+		if ($fieldOrGroup instanceof WhereGroup) {
+            $group = $fieldOrGroup;
+        } else {    
+            $group = new WhereGroup($fieldOrGroup, $operator, $value, $this->query, $this);
+        }
+        
 		$this->elements[] = ['or', $group];
 		return $group;
 	}
