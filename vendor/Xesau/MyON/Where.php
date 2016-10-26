@@ -37,7 +37,7 @@ class Where {
 			// exact comparison
 			case '=':
 			case '!=':
-				return is_scalar($value) || (is_object($value) && method_exists($value, 'myON')) || is_null($value);
+				return is_scalar($value) || (is_object($value) && method_exists($value, 'objectInfo')) || is_null($value);
 			
 			// numeric comparison
 			case '>':
@@ -46,7 +46,7 @@ class Where {
 			case '!<':
 			case '>=':
 			case '<=':
-				return is_int($value) || (is_object($value) && method_exists($value, 'myON'));
+				return is_int($value) || (is_object($value) && method_exists($value, 'objectInfo'));
 			
 			// array comparison
 			case 'in':
@@ -55,7 +55,7 @@ class Where {
 			
 			// regex comparison
 			case 'regex':
-				return is_string($value) || (is_object($value) && method_exists($value, 'myON'));
+				return is_string($value) || (is_object($value) && method_exists($value, 'objectInfo'));
 		}
 	}
 	

@@ -36,8 +36,8 @@ class MyON {
 	public static function escapeValue($value) {
 		if ($value instanceof Query) {
 			return '('. (string)$value. ')';
-		} elseif (is_object($value) && method_exists($value, 'myON')) {
-			return self::escapeValue($value->prim()[0]);
+		} elseif (is_object($value) && method_exists($value, 'objectInfo')) {
+			return self::escapeValue($value->primaryValues(false)[0]);
 		} elseif (is_int($value) || is_float($value)) {
 			return (string)$value;
         } elseif (is_null($value)) {
