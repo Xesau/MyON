@@ -19,6 +19,7 @@ trait DbObject {
     private function __construct($key) {
         $this->key = $key;
     }
+    
     public function __destruct() {
         if (count($this->changedFields) !== 0) {
             $query = 'UPDATE '. MyON::escapeField(self::getOI()->getTableName()) .' SET ';
@@ -180,7 +181,7 @@ trait DbObject {
      * @throws InvalidArgumentException When more fields are provided than are in table. (is only checked if data has been selected earlier this request)
      * @return void
      */
-    protected function insert(array $data) {
+    protected static function insert(array $data) {
         if (count($data) == 0) {
             throw new InvalidArgumentException('DbObject.insert $data cannot be empty.');
         }
