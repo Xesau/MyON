@@ -21,13 +21,34 @@ abstract class Query {
      */
 	public function where($field, $operator, $value, $continue = false) {
 		if ($this->mainWhereGroup == null) {
-			$this->mainWhereGroup = ($newGroup = new WhereGroup($field, $operator, $value, $this));
+			$this->mainWhereGroup = ($newGroup = new WhereGroup(new Where($field, $operator, $value), $this));
 		} else {
-			$newGroup = $this->mainWhereGroup->andWhere($field, $operator, $value);
+			$newGroup = (new WhereGroup($this->mainWhereGroup, $this))->andWhere($field, $operator, $value);
+            $this->mainWhereGroup = $newGroup;
 		}
         
         return $continue ? $newGroup : $this;
 	}
+    
+    /** 
+     * Limits the selection to rows where the given field follows the given condition or the previous condition
+     * 
+     * @param string|string[] $field    The field that must follow the condition
+     * @param string          $operator The operator (=, !=, etc.)
+     * @param mixed|Selection $value    The value accompanying the operator
+     * @param bool            $continue Whether to continue with the newly created group
+     * @return $this|WhereGroup See param $continue
+     */
+    public function orWhere($field, $operator, $value, $continue = false) {
+        if ($this->mainWhereGroup == null) {
+			$this->mainWhereGroup = ($newGroup = new WhereGroup(new Where($field, $operator, $value), $this));
+		} else{
+			$newGroup = (new WhereGroup($this->mainWhereGroup, $this))->orWhere($field, $operator, $value);
+            $this->mainWhereGroup = $newGroup;
+		}
+        
+        return $continue ? $newGroup : $this;
+    }
 	
 	public function asc($field) {
 		$this->orderRules[] = new Order($field, 'asc');

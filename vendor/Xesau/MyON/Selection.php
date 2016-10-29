@@ -53,6 +53,17 @@ class Selection extends Query implements Iterator, Countable {
             $sql = 'SELECT COUNT(*)';
         } elseif ($this->mode == 'select') {
             $sql = 'SELECT *';
+        } elseif ($this->mode == 'select_prims') {
+            $sql = 'SELECT ';
+            $first = true;
+            foreach($this->oi->getPrimaryFields() as $f) {
+                if ($first) {
+                    $sql .= MyON::escapeField($f);
+                    $first = false;
+                } else {
+                    $sql .= ', '. MyON::escapeField($f);
+                }
+            }
         } elseif ($this->mode == 'delete') {
             $sql = 'DELETE';
         }
@@ -162,6 +173,19 @@ class Selection extends Query implements Iterator, Countable {
         }
     }
 	
+    /**
+     * Selects the primary fields
+     *
+     * @return array
+     */
+    public function prims() {
+        $this->mode = 'select_prims';
+        $this->iterating = true;
+		$stmt = MyON::getPDO()->query($this->__toString());
+		
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
     /**
      * Performs the query and injects data to DbObject
      *

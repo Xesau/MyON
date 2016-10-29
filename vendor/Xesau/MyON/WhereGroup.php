@@ -15,10 +15,10 @@ class WhereGroup {
 	private $query;
 	private $parent;
 	
-	public function __construct($field, $operator, $value, Query $query, WhereGroup $parent = null) {
+	public function __construct($where, Query $query, WhereGroup $parent = null) {
 		$this->query = $query;
 		$this->parent = $parent;
-		$this->andWhere($field, $operator, $value);
+		$this->elements[] = ['and', $where];
 	}
 	
 	public function andWhere($field, $operator, $value) {
@@ -35,7 +35,7 @@ class WhereGroup {
 		if ($fieldOrGroup instanceof WhereGroup) {
             $group = $fieldOrGroup;
         } else {    
-            $group = new WhereGroup($fieldOrGroup, $operator, $value, $this->query, $this);
+            $group = new WhereGroup(new Where($fieldOrGroup, $operator, $value), $this->query, $this);
         }
         
 		$this->elements[] = ['and', $group];
@@ -46,7 +46,7 @@ class WhereGroup {
 		if ($fieldOrGroup instanceof WhereGroup) {
             $group = $fieldOrGroup;
         } else {    
-            $group = new WhereGroup($fieldOrGroup, $operator, $value, $this->query, $this);
+            $group = new WhereGroup(new Where($fieldOrGroup, $operator, $value), $this->query, $this);
         }
         
 		$this->elements[] = ['or', $group];
@@ -72,7 +72,6 @@ class WhereGroup {
 	
 	public function __toString() {
 		$cElements = count($this->elements);
-		
 		if ($cElements == 0) {
 			return 'FALSE';
 		}
@@ -81,20 +80,17 @@ class WhereGroup {
 			return (string)$this->elements[0][1];
 		}
 		
-		$sql = (string)$this->elements[0][1];
+		$sql = '('.(string)$this->elements[0][1];
 		$pastFirst = false;
 		foreach($this->elements as $element) {
 			if (!$pastFirst) {
 				$pastFirst = true;
 			} else {
-				$sql .= ' '. strtoupper($element[0]) .' '.
-					($element[1] instanceof WhereGroup
-					? '(' . (string)$element[1] .')'
-					: (string)$element[1]);
+				$sql .= ' '. strtoupper($element[0]) .' '. (string)$element[1];
 			}
 		}
 		
-		return $sql;
+		return $sql.')';
 	}
 	
 }
