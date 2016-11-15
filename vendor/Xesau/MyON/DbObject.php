@@ -42,10 +42,14 @@ trait DbObject {
             MyON::getPDO()->query($query);
         }
     }
+
+    public function __isset($field) {
+        return isset(self::$tableFields[$field]);
+    }
     
     public function __get($field) {
         // Validate field name
-        if (!isset(self::$tableFields[$field])) {
+        if (!self::__isset($field)) {        
             // Class Name Parts
             $cnp = explode('\\', __CLASS__);
             
