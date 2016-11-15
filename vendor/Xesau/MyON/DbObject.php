@@ -108,7 +108,7 @@ trait DbObject {
      * Selects a row by the values of it's primary fields
      *
      * @param mixed|mixed[] $primaryFields The primary fields
-     * @throws IllegalArgumentException When $primaryFields does not provide information for all primary fields.
+     * @throws InvalidArgumentException When $primaryFields does not provide information for all primary fields.
      * @return <DbObject> 
      */
 	public static function byPrim($primaryFields) {
@@ -127,7 +127,7 @@ trait DbObject {
 				for($i = 0; $i < $pfCount; $i++)
 					$primFields[$origPfOrder[$i]] = $primaryFields[$i];
 			} else {
-				throw new IllegalArgumentException('DbObject.byPrim $primaryFields must contain all primary fields.');	
+				throw new InvalidArgumentException('DbObject.byPrim $primaryFields must contain all primary fields.');	
 			}
 		} else {
 			$need = $origPfOrder;
@@ -137,7 +137,7 @@ trait DbObject {
 			if ($curr == $need) {
 				$primFields = $primaryFields;
 			} else {
-				throw new IllegalArgumentException('DbObject.byPrim $primaryFields must contain all primary fields.');
+				throw new InvalidArgumentException('DbObject.byPrim $primaryFields must contain all primary fields.');
 			}
 		}
         
