@@ -56,6 +56,12 @@ class Where {
 			// regex comparison
 			case 'regex':
 				return is_string($value) || (is_object($value) && method_exists($value, 'objectInfo'));
+                
+            // other
+            case 'like':
+            case '%':
+                return is_scalar($value);
+                break;
 		}
 	}
 	
@@ -70,6 +76,7 @@ class Where {
 			case '>=':
 			case '<=':
 			case 'in':
+            case 'like':
 				return strtoupper($operator);
 			
 			// Special operators
@@ -101,6 +108,7 @@ class Where {
 			case '<=':
 			case '=':
 			case '!=':
+            case 'LIKE':
 				return MyON::escapeValue($value);
 		}
 	}
