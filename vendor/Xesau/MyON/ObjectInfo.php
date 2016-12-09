@@ -67,7 +67,7 @@ class ObjectInfo
 	 */
 	public function ref($fieldName, $className) {
 		if ($className !== '.self') {
-			if (!is_string($className) || strlen($className) != 0 || !class_exists($className)) {
+			if (!is_string($className) || strlen($className) == 0 || !class_exists($className)) {
                 if ($className[0] !== '~') {
                     throw new InvalidArgumentException('ObjectInfo.ref: $className ought to be a valid class name, got '. gettype($className) .($className === null ? '' : ' '. strip_tags($className)).'.');
                 }
