@@ -6,10 +6,10 @@ use RuntimeException;
 use InvalidArgumentException;
 
 trait DbObject {
-	
-	private static $objectInfo;
     
-	private static $cachedData = [];
+    private static $objectInfo;
+    
+    private static $cachedData = [];
     private static $cachedObjects = [];
     
     private static $tableFields = false;
@@ -54,7 +54,7 @@ trait DbObject {
             $cnp = explode('\\', __CLASS__);
             
             // Throw Exception: ClassName.__get $field must be a valid field.
-            throw new InvalidArgumentException(last($cnp). '.__get $field must be a valid field.');
+            throw new InvalidArgumentException(end($cnp). '.__get $field must be a valid field.');
         }
         
         if (self::$tableFields[$field] !== false) {
@@ -75,7 +75,7 @@ trait DbObject {
             $cnp = explode('\\', __CLASS__);
             
             // Throw Exception: ClassName.__get $field must be a valid field.
-            throw new InvalidArgumentException(last($cnp). '.__set $field must be a valid field.');    
+            throw new InvalidArgumentException(end($cnp). '.__set $field must be a valid field.');    
         }
         
         self::$cachedData[$this->key][$field] = $value;
@@ -84,26 +84,26 @@ trait DbObject {
             $this->changedFields[] = $field;
     }
     
-	protected static function objectInfo() {// Class Name Parts
+    protected static function objectInfo() {// Class Name Parts
         $cnp = explode('\\', __CLASS__);
         
         // Throw Exception: ClassName doesn't implement objectInfo() function
-		throw new RuntimeException(last($cnp). ' doesn\'t implement objectInfo() function.');
-	}
-	
+        throw new RuntimeException(end($cnp). ' doesn\'t implement objectInfo() function.');
+    }
+    
     /**
      * Gets the table source and structure information for this class.
      *
      * @return ObjectInfo The Object Info
      */
-	public static function getOI() {
-		if (self::$objectInfo === null) {
-			self::$objectInfo = self::objectInfo();
-		}
-		
-		return self::$objectInfo;
-	}
-	
+    public static function getOI() {
+        if (self::$objectInfo === null) {
+            self::$objectInfo = self::objectInfo();
+        }
+        
+        return self::$objectInfo;
+    }
+    
     /**
      * Selects a row by the values of it's primary fields
      *
@@ -111,35 +111,35 @@ trait DbObject {
      * @throws InvalidArgumentException When $primaryFields does not provide information for all primary fields.
      * @return <DbObject> 
      */
-	public static function byPrim($primaryFields) {
-		$origPfOrder = self::getOI()->getPrimaryFields();
+    public static function byPrim($primaryFields) {
+        $origPfOrder = self::getOI()->getPrimaryFields();
         
         // Make $primaryFields an array
         if (!is_array($primaryFields)) {
             $primaryFields = (array)$primaryFields;
         }
         
-		// If the array is not associative 
-		if (array_values($primaryFields) == $primaryFields) {
-			$pfCount = count($primaryFields);
-			if ($pfCount == count($origPfOrder)) {
-				$primFields = [];
-				for($i = 0; $i < $pfCount; $i++)
-					$primFields[$origPfOrder[$i]] = $primaryFields[$i];
-			} else {
-				throw new InvalidArgumentException('DbObject.byPrim $primaryFields must contain all primary fields.');	
-			}
-		} else {
-			$need = $origPfOrder;
-			sort($need);
-			$curr = array_keys($primaryFields);
-			sort ($curr);
-			if ($curr == $need) {
-				$primFields = $primaryFields;
-			} else {
-				throw new InvalidArgumentException('DbObject.byPrim $primaryFields must contain all primary fields.');
-			}
-		}
+        // If the array is not associative 
+        if (array_values($primaryFields) == $primaryFields) {
+            $pfCount = count($primaryFields);
+            if ($pfCount == count($origPfOrder)) {
+                $primFields = [];
+                for($i = 0; $i < $pfCount; $i++)
+                    $primFields[$origPfOrder[$i]] = $primaryFields[$i];
+            } else {
+                throw new InvalidArgumentException('DbObject.byPrim $primaryFields must contain all primary fields.');    
+            }
+        } else {
+            $need = $origPfOrder;
+            sort($need);
+            $curr = array_keys($primaryFields);
+            sort ($curr);
+            if ($curr == $need) {
+                $primFields = $primaryFields;
+            } else {
+                throw new InvalidArgumentException('DbObject.byPrim $primaryFields must contain all primary fields.');
+            }
+        }
         
         $key = json_encode(array_values($primFields));
         if (isset(self::$cachedObjects[$key])) {
@@ -155,7 +155,7 @@ trait DbObject {
         
             return $select->first();
         }
-	}
+    }
     
     /**
      * Returns the primary fields
@@ -317,13 +317,13 @@ trait DbObject {
      * @param bool|string $refs Whether to load the references, if 'deep' deepload references.
      * @return Selection
      */
-	public static function select($refs = false) {
-		$select = new Selection(__CLASS__);
+    public static function select($refs = false) {
+        $select = new Selection(__CLASS__);
         
         if ($refs !== false)
             $select->loadReferences($refs !== false, $refs == 'deep');
         
         return $select;
-	}
-	
+    }
+    
 }
