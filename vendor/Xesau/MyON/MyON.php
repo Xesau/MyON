@@ -117,5 +117,7 @@ class MyON {
             $ownNamespace = substr($own, 0, strrpos($own, '\\'));
             return $ownNamespace .'\\'. substr($ref, 1);
         }
+		
+		return $ref;
     }
 }
