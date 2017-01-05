@@ -27,9 +27,29 @@ class Where {
 	
 	public function __toString() {
 		$sqlOp = self::getSqlOperator($this->operator);
-		return MyON::escapeField($this->field) .' '. $sqlOp .' '. self::getOperatorVal($sqlOp, $this->value);
+        $val = self::getOperatorVal($sqlOp, $this->value);
+        if ($val === null)
+            return '**NOT**';
+        
+        return MyON::escapeField($this->field) .' '. $sqlOp .' '. $val;
 	}
 	
+    private static function validateSpecialSelect(array $value) {
+        $c = count($value);
+        
+        if ($c == 1)
+            if ($value[0] instanceof Query)
+                return false;
+        
+        if (count($value) !== 2)
+            return true;
+        
+        if ($value[0] instanceof Query)
+            return is_string($value[1]);
+        
+        return true;
+    }
+    
 	private static function validateOperator($operator, $value) {
 		$operator = strtolower($operator);
 		
@@ -51,7 +71,7 @@ class Where {
 			// array comparison
 			case 'in':
 			case '!in':
-				return is_array($value) || $value instanceof Traversable;
+				return (is_array($value) && self::validateSpecialSelect($value)) || $value instanceof Traversable;
 			
 			// regex comparison
 			case 'regex':
@@ -76,6 +96,7 @@ class Where {
 			case '>=':
 			case '<=':
 			case 'in':
+			case 'not in':
             case 'like':
 				return strtoupper($operator);
 			
@@ -95,7 +116,16 @@ class Where {
 	
 	private static function getOperatorVal($operator, $value) {
 		switch($operator) {
-			case 'IN': 
+			case 'IN':
+            case 'NOT IN':
+                if ($value === [])
+                    return null;
+                
+                if ($value[0] instanceof Query) {
+                    $s = $value[0]->__toString();
+                    return '(SELECT '. MyON::escapeField($value[1]) . substr($s, 8) . ')';
+                }
+                
 				// array $value
 				$outVals = [];
 				foreach($value as $v) {
