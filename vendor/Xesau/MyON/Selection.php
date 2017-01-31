@@ -34,6 +34,10 @@ class Selection extends Query implements Iterator, Countable {
         $this->destinationClass = $destinationClass;
     }
     
+	public function getOI() {
+		return $this->oi;
+	}
+	
     /**
      * Sets whether to (deep) parse references (useful for bulkloading)
      *
