@@ -12,28 +12,28 @@ use RuntimeException;
  * Traversable MySQL SELECT
  */
 class Selection extends Query implements Iterator, Countable {
-	
+    
     private $mode = 'select';
     
-	private $oi;
-	private $destinationClass;
-	
+    private $oi;
+    private $destinationClass;
+    
     private $iterating = false;
-	private $currentIndex = 0;
-	private $results = null;
-	
+    private $currentIndex = 0;
+    private $results = null;
+    
     private $loadReferences = false;
     private $loadDeepReferences = false;
-    	
-	public function __construct($destinationClass) {
-		if (!class_exists($destinationClass)) {
-			throw new InvalidArgumentException('Selection.destinationClass is not a valid class, got '. $destinationClass .'.');
-		}
-		
-		$this->oi = $destinationClass::getOI();
-		$this->destinationClass = $destinationClass;
-	}
-	
+        
+    public function __construct($destinationClass) {
+        if (!class_exists($destinationClass)) {
+            throw new InvalidArgumentException('Selection.destinationClass is not a valid class, got '. $destinationClass .'.');
+        }
+        
+        $this->oi = $destinationClass::getOI();
+        $this->destinationClass = $destinationClass;
+    }
+    
     /**
      * Sets whether to (deep) parse references (useful for bulkloading)
      *
@@ -47,8 +47,8 @@ class Selection extends Query implements Iterator, Countable {
         return $this;
     }
     
-	public function __toString() {
-		// SELECT ... FROM ...
+    public function __toString() {
+        // SELECT ... FROM ...
         if ($this->mode == 'count') {
             $sql = 'SELECT COUNT(*)';
         } elseif ($this->mode == 'select') {
@@ -69,32 +69,32 @@ class Selection extends Query implements Iterator, Countable {
         }
         
         $sql .= ' FROM '. MyON::escapeField($this->oi->getTableName());
-		
-		// WHERE ...
-		if ($this->mainWhereGroup !== null) {
-			$sql .= ' WHERE ' . (string)$this->mainWhereGroup;
-		}
-		
-		// ORDER BY ...
-		if (count($this->orderRules) !== 0) {
-			$sql .= ' ORDER BY ';
-			foreach($this->orderRules as $orderRule) {
-				$sql .= (string)$orderRule;
-			}
-		}
-		
-		// LIMIT ...
-		if ($this->limit !== false) {
-			$sql .= ' LIMIT ' . $this->limit;
-		}
-		
-		// OFFSET ...
-		if ($this->offset !== false) {
-			$sql .= ' OFFSET '. $this->offset;
-		}
-		
-		return $sql;
-	}
+        
+        // WHERE ...
+        if ($this->mainWhereGroup !== null) {
+            $sql .= ' WHERE ' . (string)$this->mainWhereGroup;
+        }
+        
+        // ORDER BY ...
+        if (count($this->orderRules) !== 0) {
+            $sql .= ' ORDER BY ';
+            foreach($this->orderRules as $orderRule) {
+                $sql .= (string)$orderRule;
+            }
+        }
+        
+        // LIMIT ...
+        if ($this->limit !== false) {
+            $sql .= ' LIMIT ' . $this->limit;
+        }
+        
+        // OFFSET ...
+        if ($this->offset !== false) {
+            $sql .= ' OFFSET '. $this->offset;
+        }
+        
+        return $sql;
+    }
     
     /**
      * Counts the amount of rows that would be retrieved from this query
@@ -104,7 +104,6 @@ class Selection extends Query implements Iterator, Countable {
     public function count() {
         $this->mode = 'count';
         $stmt = MyON::getPDO()->query($this->__toString());
-        $stmt->execute();
         $res = $stmt->fetch(PDO::FETCH_NUM);
         return (int)$res[0];
     }
@@ -117,45 +116,44 @@ class Selection extends Query implements Iterator, Countable {
     public function delete() {
         $this->mode = 'delete';
         $stmt = MyON::getPDO()->query($this->__toString());
-        $stmt->execute();
         return $stmt->rowCount();
     }
-	
-	public function current() {
-		if (!$this->iterating)
-			$this->perform();
+    
+    public function current() {
+        if (!$this->iterating)
+            $this->perform();
         if (count($this->results) == 0)
             return null;
         
         return $this->results[$this->currentIndex];
-	}
-	public function key() {
-		if ($this->iterating) {
+    }
+    public function key() {
+        if ($this->iterating) {
             $pfs = $this->oi->getPrimaryFields();
             if (count($pfs) == 1)
                 return $this->current()->primaryValues()[$pfs[0]];
             else
                 return $this->current()->primaryValues();
-		} else {
-			throw new RuntimeException('Cannot ask key before starting iteration.');
-		}
-	}
-	public function next() {
-		if (!$this->iterating)
-			$this->perform();
-		$this->currentIndex++;
-	}
-	public function rewind() {
-		if (!$this->iterating)
-			$this->perform();
-		$this->currentIndex = 0;
-	}
-	public function valid() {
-		if (!$this->iterating)
-			$this->perform();
-		return $this->currentIndex < count($this->results);
-	}
-	
+        } else {
+            throw new RuntimeException('Cannot ask key before starting iteration.');
+        }
+    }
+    public function next() {
+        if (!$this->iterating)
+            $this->perform();
+        $this->currentIndex++;
+    }
+    public function rewind() {
+        if (!$this->iterating)
+            $this->perform();
+        $this->currentIndex = 0;
+    }
+    public function valid() {
+        if (!$this->iterating)
+            $this->perform();
+        return $this->currentIndex < count($this->results);
+    }
+    
     /**
      * Returns the first result.
      * If the selection had not been performed yet, it will automatically limit the result to 1.
@@ -172,7 +170,7 @@ class Selection extends Query implements Iterator, Countable {
             return $this->current();
         }
     }
-	
+    
     /**
      * Selects the primary fields
      *
@@ -181,8 +179,8 @@ class Selection extends Query implements Iterator, Countable {
     public function prims() {
         $this->mode = 'select_prims';
         $this->iterating = true;
-		$stmt = MyON::getPDO()->query($this->__toString());
-		
+        $stmt = MyON::getPDO()->query($this->__toString());
+        
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
@@ -191,33 +189,33 @@ class Selection extends Query implements Iterator, Countable {
      *
      * @param bool $loadObjects Whether to store the results as objects
      */
-	public function perform($loadObjects = true) {
+    public function perform($loadObjects = true) {
         $this->mode = 'select';
         $this->iterating = true;
         $this->results = [];
-		$stmt = MyON::getPDO()->query($this->__toString());
-		
+        $stmt = MyON::getPDO()->query($this->__toString());
+        
         static $n;
         $n++;
         if ($n > 20)
             return;
         
-		$entries = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		
+        $entries = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
         // Inject entries into DbObject but don't overwrite
         $destC = $this->destinationClass;
         $destC::inject($entries, false);
-		
-        foreach($entries as $entry) {
-            // Load objects and store results if needed
-            if ($loadObjects === true) {
+        
+		// Load objects and store results if needed
+		if ($loadObjects === true) {
+			foreach($entries as $entry) {
                 $pfVals = [];
                 foreach($this->oi->getPrimaryFields() as $field) {
                     $pfVals[$field] = $entry[$field];
                 }
                 $this->results[] = $destC::byPrim($pfVals);
             }
-		}
+        }
         
         if ($this->loadReferences) {
             $referencedFields = $this->oi->getReferencedFields();
@@ -234,7 +232,8 @@ class Selection extends Query implements Iterator, Countable {
                 foreach($entries as $entry) {
                     $refFieldValMap[$entry[$field]] = true;
                 }
-                // Don't load already-loaded entries
+ 
+				// Don't load already-loaded entries
                 foreach($refDestC::getCachedObjectPrims() as $cachedObjectPrims) {
                     unset($refFieldValMap[$cachedObjectPrims[0]]);
                 }
@@ -256,5 +255,5 @@ class Selection extends Query implements Iterator, Countable {
                 }
             }
         }
-	}
+    }
 }
