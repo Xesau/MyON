@@ -29,7 +29,7 @@ class Where {
         $sqlOp = self::getSqlOperator($this->operator);
         $val = self::getOperatorVal($sqlOp, $this->value);
         if ($val === null)
-            return '**NOT**';
+            return '1';
         
         return MyON::escapeField($this->field) .' '. $sqlOp .' '. $val;
     }
