@@ -31,6 +31,13 @@ class Where {
         if ($val === null)
             return '1';
         
+        if ($val == 'NULL') {
+            if ($sqlOp == '=')
+                $sqlOp = 'IS';
+            if ($sqlOp == '!=')
+                $sqlOp = 'IS NOT';
+        }
+        
         return MyON::escapeField($this->field) .' '. $sqlOp .' '. $val;
     }
     
