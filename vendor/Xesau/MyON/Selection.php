@@ -34,10 +34,14 @@ class Selection extends Query implements Iterator, Countable {
         $this->destinationClass = $destinationClass;
     }
     
-	public function getOI() {
-		return $this->oi;
-	}
-	
+    public function getOI() {
+        return $this->oi;
+    }
+    
+    public function getModelClass() {
+        return $this->destinationClass;
+    }
+    
     /**
      * Sets whether to (deep) parse references (useful for bulkloading)
      *
@@ -210,9 +214,9 @@ class Selection extends Query implements Iterator, Countable {
         $destC = $this->destinationClass;
         $destC::inject($entries, false);
         
-		// Load objects and store results if needed
-		if ($loadObjects === true) {
-			foreach($entries as $entry) {
+        // Load objects and store results if needed
+        if ($loadObjects === true) {
+            foreach($entries as $entry) {
                 $pfVals = [];
                 foreach($this->oi->getPrimaryFields() as $field) {
                     $pfVals[$field] = $entry[$field];
@@ -237,7 +241,7 @@ class Selection extends Query implements Iterator, Countable {
                     $refFieldValMap[$entry[$field]] = true;
                 }
  
-				// Don't load already-loaded entries
+                // Don't load already-loaded entries
                 foreach($refDestC::getCachedObjectPrims() as $cachedObjectPrims) {
                     unset($refFieldValMap[$cachedObjectPrims[0]]);
                 }
