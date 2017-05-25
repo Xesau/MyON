@@ -137,4 +137,14 @@ abstract class Query
 
         return $this;
     }
+    
+    public function page($page, $pageLength) {
+        $page = max(1, $page);
+        $pageLength = max(1, $pageLength);
+        
+        $this->limit($pageLength);
+        $htis->skip(($page - 1) * $pageLength);
+
+        return $this;
+    }
 }
