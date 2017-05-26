@@ -143,7 +143,7 @@ abstract class Query
         $pageLength = max(1, $pageLength);
         
         $this->limit($pageLength);
-        $htis->skip(($page - 1) * $pageLength);
+        $this->offset(($page - 1) * $pageLength);
 
         return $this;
     }
