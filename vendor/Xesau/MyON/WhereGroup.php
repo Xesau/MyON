@@ -2,7 +2,7 @@
 
 namespace Xesau\MyON;
 
-use InvalidArgumentException;
+use RuntimeException;
 use Traversable;
 
 class WhereGroup {
