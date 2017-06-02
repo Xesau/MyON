@@ -203,11 +203,6 @@ class Selection extends Query implements Iterator, Countable {
         $this->results = [];
         $stmt = MyON::getPDO()->query($this->__toString());
         
-        static $n;
-        $n++;
-        if ($n > 20)
-            return;
-        
         $entries = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         // Inject entries into DbObject but don't overwrite
