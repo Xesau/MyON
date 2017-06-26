@@ -23,17 +23,16 @@ abstract class Query
      * @return $this|WhereGroup See param $continue
      */
     public function where($field, $operator, $value, $continue = false)
-    {
+    {   
         if ($this->mainWhereGroup == null) {
-            $this->mainWhereGroup = ($newGroup = new WhereGroup(new Where($field, $operator, $value), $this));
+            $this->mainWhereGroup = $nc = new WhereGroup(new Where($field, $operator, $value), $this);
         } else {
-            $newGroup = (new WhereGroup($this->mainWhereGroup, $this))->andWhere($field, $operator, $value);
-            $this->mainWhereGroup = $newGroup;
+            $nc = $this->mainWhereGroup->andGroup($field, $operator, $value);
         }
 
-        return $continue ? $newGroup : $this;
+        return $continue ? $nc : $this;
     }
-
+    
     /**
      * Limits the selection to rows where the given field follows the given condition or the previous condition.
      *
@@ -49,7 +48,7 @@ abstract class Query
         if ($this->mainWhereGroup == null) {
             $this->mainWhereGroup = ($newGroup = new WhereGroup(new Where($field, $operator, $value), $this));
         } else {
-            $newGroup = (new WhereGroup($this->mainWhereGroup, $this))->orWhere($field, $operator, $value);
+            $newGroup = $this->mainWhereGroup->orGroup($field, $operator, $value);
             $this->mainWhereGroup = $newGroup;
         }
 
@@ -74,6 +73,12 @@ abstract class Query
     {
         $this->orderRules[] = new OrderByField($field, $values);
 
+        return $this;
+    }
+    
+    public function rand() {
+        $this->orderRules[] = new RandomOrder();
+        
         return $this;
     }
 
