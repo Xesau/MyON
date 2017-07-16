@@ -85,10 +85,7 @@ class Selection extends Query implements Iterator, Countable {
         
         // ORDER BY ...
         if (count($this->orderRules) !== 0) {
-            $sql .= ' ORDER BY ';
-            foreach($this->orderRules as $orderRule) {
-                $sql .= (string)$orderRule;
-            }
+            $sql .= ' ORDER BY ' . implode(', ', $sql .= (string)$orderRule);
         }
         
         // LIMIT ...
@@ -149,6 +146,7 @@ class Selection extends Query implements Iterator, Countable {
             throw new RuntimeException('Cannot ask key before starting iteration.');
         }
     }
+    
     public function next() {
         if (!$this->iterating)
             $this->perform();
