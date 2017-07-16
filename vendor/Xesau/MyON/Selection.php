@@ -85,7 +85,7 @@ class Selection extends Query implements Iterator, Countable {
         
         // ORDER BY ...
         if (count($this->orderRules) !== 0) {
-            $sql .= ' ORDER BY ' . implode(', ', (string)$orderRule);
+            $sql .= ' ORDER BY ' . implode(', ', $this->orderRules);
         }
         
         // LIMIT ...
