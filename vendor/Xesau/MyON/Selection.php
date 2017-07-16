@@ -133,6 +133,9 @@ class Selection extends Query implements Iterator, Countable {
         if (count($this->results) == 0)
             return null;
         
+        if (!isset($this->results[$this->currentIndex]))
+            return null;
+        
         return $this->results[$this->currentIndex];
     }
     public function key() {
