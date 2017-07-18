@@ -34,7 +34,7 @@ class WhereGroup {
 	public function andGroup($fieldOrGroup, $operator, $value) {
 		if ($fieldOrGroup instanceof WhereGroup) {
             $group = $fieldOrGroup;
-        } else {    
+        } else {
             $group = new WhereGroup(new Where($fieldOrGroup, $operator, $value), $this->query, $this);
         }
         
@@ -42,7 +42,7 @@ class WhereGroup {
 		return $group;
 	}
 	
-	public function orGroup($field, $operator, $value) {
+	public function orGroup($fieldOrGroup, $operator, $value) {
 		if ($fieldOrGroup instanceof WhereGroup) {
             $group = $fieldOrGroup;
         } else {    
