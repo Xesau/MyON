@@ -201,7 +201,7 @@ class Selection extends Query implements Iterator, Countable {
         $ref = MyON::parseClassRef($refs[$field], $destC);
         $primary = $ref::getOI()->getPrimaryFields();
         $primaryThis = $this->oi->getPrimaryFields();
-        return $ref::select()->where($primary[0], 'in', [$this, $primaryThis[0]]);
+        return $ref::select()->where($primary[0], 'in', [$this, $field]);
     }
     
     /**
