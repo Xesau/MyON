@@ -193,6 +193,17 @@ class Selection extends Query implements Iterator, Countable {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
+    public function getReferenced($field) {
+        $destC = $this->destinationClass;
+        $refs = $this->oi->getReferencedFields();
+        if (!isset($refs[$field]))
+            throw new InvalidArgumentException('Selection.getReferenced(field): field is not a reference');
+        $ref = MyON::parseClassRef($refs[$field], $destC);
+        $primary = $ref::getOI()->getPrimaryFields();
+        $primaryThis = $this->oi->getPrimaryFields();
+        return $ref::select()->where($primary[0], 'in', [$this, $primaryThis[0]]);
+    }
+    
     /**
      * Performs the query and injects data to DbObject
      *
