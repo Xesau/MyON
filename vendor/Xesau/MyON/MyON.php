@@ -25,14 +25,24 @@ class MyON {
 		return self::$pdo;
 	}
 	
-	public static function getPrefix() {
+	public static function getPrefix($escaped = false) {
 		if (self::$pdo === null) {
 			throw new RuntimeException('MyONConfig has not been initialized yet.');
 		}
 		
+        if ($escaped)
+            return str_replace('`' , '``', self::$prefix);
+        
 		return self::$prefix;
 	}
 	
+    public static function execute($sql, array $parameters = []) {
+        $sql = preg_replace('/(?<!\\\\)\$\#/', self::$prefix, $sql);
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute($parameters);
+        return $stmt;
+    }
+    
 	public static function escapeValue($value) {
 		if ($value instanceof Query) {
 			return '('. (string)$value. ')';
