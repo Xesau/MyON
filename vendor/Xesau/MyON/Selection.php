@@ -7,6 +7,7 @@ use Iterator;
 use Countable;
 
 use RuntimeException;
+use InvalidArgumentException;
 
 /**
  * Traversable MySQL SELECT
