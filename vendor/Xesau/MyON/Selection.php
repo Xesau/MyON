@@ -103,6 +103,18 @@ class Selection extends Query implements Iterator, Countable {
     }
     
     /**
+     * Clears the result set and prepares the selection for reuse
+     * 
+     * @return $this
+     */
+    public function reuse() {
+        $this->iterating = false;
+        $this->currentIndex = 0;
+        $this->results = null;
+        return $this;
+    }
+    
+    /**
      * Counts the amount of rows that would be retrieved from this query
      *
      * @return int The amount

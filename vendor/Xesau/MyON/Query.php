@@ -101,7 +101,7 @@ abstract class Query
         if ($offset !== false) {
             if (is_int($offset)) {
                 if ($offset < 0) {
-                    throw new InvalidArgumentException('Query.offset $offset must be an integer equal to or greater than 0, or -1 to disable the offset.');
+                    throw new InvalidArgumentException('Query.offset $offset must be an integer equal to or greater than 0, or FALSE to disable the offset.');
                 }
             } else {
                 throw new InvalidArgumentException('Query.offset $offset is not an int or FALSE.');
@@ -131,7 +131,7 @@ abstract class Query
         if ($limit !== false) {
             if (is_int($limit)) {
                 if ($limit < 1) {
-                    throw new InvalidArgumentException('Query.limit $limit must be an integer greater than 0, or -1 to disable the limit.');
+                    throw new InvalidArgumentException('Query.limit $limit must be an integer greater than 0, or FALSE to disable the limit.');
                 }
             } else {
                 throw new InvalidArgumentException('Query.limit $limit is not an int or FALSE.');
