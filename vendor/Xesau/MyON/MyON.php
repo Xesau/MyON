@@ -4,6 +4,7 @@ namespace Xesau\MyON;
 
 use PDO;
 use InvalidArgumentException;
+use RuntimeException;
 
 class MyON {
 	
@@ -19,7 +20,7 @@ class MyON {
     
 	public static function getPDO() {
 		if (self::$pdo === null) {
-			throw new RuntimeException('MyONConfig has not been initialized yet.');
+			throw new RuntimeException('MyON has not been initialized yet.');
 		}
 		
 		return self::$pdo;
@@ -27,7 +28,7 @@ class MyON {
 	
 	public static function getPrefix($escaped = false) {
 		if (self::$pdo === null) {
-			throw new RuntimeException('MyONConfig has not been initialized yet.');
+			throw new RuntimeException('MyON has not been initialized yet.');
 		}
 		
         if ($escaped)
