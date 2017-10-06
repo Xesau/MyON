@@ -25,12 +25,13 @@ abstract class Query
     public function where($field, $operator, $value, $continue = false)
     {   
         if ($this->mainWhereGroup == null) {
-            $this->mainWhereGroup = $nc = new WhereGroup(new Where($field, $operator, $value), $this);
+            $newGroup = new WhereGroup(new Where($field, $operator, $value), $this);
+            $this->mainWhereGroup = $newGroup;
         } else {
-            $nc = $this->mainWhereGroup->andGroup($field, $operator, $value);
+            $newGroup = $this->mainWhereGroup->andGroup($field, $operator, $value);
         }
 
-        return $continue ? $nc : $this;
+        return $continue ? $newGroup : $this;
     }
     
     /**
@@ -46,10 +47,10 @@ abstract class Query
     public function orWhere($field, $operator, $value, $continue = false)
     {
         if ($this->mainWhereGroup == null) {
-            $this->mainWhereGroup = ($newGroup = new WhereGroup(new Where($field, $operator, $value), $this));
+            $newGroup = new WhereGroup(new Where($field, $operator, $value), $this);
+            $this->mainWhereGroup = $newGroup;
         } else {
             $newGroup = $this->mainWhereGroup->orGroup($field, $operator, $value);
-            $this->mainWhereGroup = $newGroup;
         }
 
         return $continue ? $newGroup : $this;
