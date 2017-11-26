@@ -22,7 +22,7 @@ class Where {
         
         $this->field = $field;
         $this->operator = $operator;
-        $this->value = $value;
+        $this->value = is_object($value) ? clone($value) : $value;
     }
     
     public function __toString() {
