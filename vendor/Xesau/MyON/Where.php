@@ -137,7 +137,7 @@ class Where {
                 }
                 
                 if ($value[0] instanceof Query) {
-                    $s = $value[0]->__toString();
+                    $s = $value[0]->getQuery('select');
                     return '(SELECT '. MyON::escapeField($value[1]) . substr($s, 8) . ')';
                 }
                 
