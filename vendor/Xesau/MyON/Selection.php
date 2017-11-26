@@ -193,6 +193,14 @@ class Selection extends Query implements Iterator, Countable {
         }
     }
     
+    public function getQuery($mode) {
+        $tempMode = $this->mode;
+        $this->mode = $mode;
+        $query = $this->__toString();
+        $this->mode = $tempMode;
+        return $query;
+    }
+    
     /**
      * Selects the primary fields
      *
