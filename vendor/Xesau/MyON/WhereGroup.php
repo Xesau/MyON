@@ -18,7 +18,9 @@ class WhereGroup {
 	public function __construct($where, Query $query, WhereGroup $parent = null) {
 		$this->query = $query;
 		$this->parent = $parent;
-		$this->elements[] = ['and', $where];
+        
+        if ($where != null)
+            $this->elements[] = ['and', $where];
 	}
 	
 	public function andWhere($field, $operator, $value) {
@@ -31,7 +33,7 @@ class WhereGroup {
 		return $this;
 	}
 	
-	public function andGroup($fieldOrGroup, $operator, $value) {
+	public function andGroup($fieldOrGroup, $operator = null, $value = null) {
 		if ($fieldOrGroup instanceof WhereGroup) {
             $group = $fieldOrGroup;
         } else {
@@ -42,7 +44,7 @@ class WhereGroup {
 		return $group;
 	}
 	
-	public function orGroup($fieldOrGroup, $operator, $value) {
+	public function orGroup($fieldOrGroup, $operator = null, $value = null) {
 		if ($fieldOrGroup instanceof WhereGroup) {
             $group = $fieldOrGroup;
         } else {    
