@@ -73,7 +73,7 @@ class Where {
             case '!<':
             case '>=':
             case '<=':
-                return is_int($value) || (is_object($value) && method_exists($value, 'objectInfo'));
+                return is_numeric($value) || (is_object($value) && method_exists($value, 'objectInfo'));
             
             // array comparison
             case 'in':
