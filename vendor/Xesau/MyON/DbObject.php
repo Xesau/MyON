@@ -116,7 +116,7 @@ trait DbObject {
         
         // Make $primaryFields an array
         if (!is_array($primaryFields)) {
-            $primaryFields = (array)$primaryFields;
+            $primaryFields = [$primaryFields];
         }
         
         // If the array is not associative 
@@ -130,6 +130,7 @@ trait DbObject {
                 throw new InvalidArgumentException('DbObject.byPrim $primaryFields must contain all primary fields.');    
             }
         } else {
+            
             $need = $origPfOrder;
             sort($need);
             $curr = array_keys($primaryFields);
