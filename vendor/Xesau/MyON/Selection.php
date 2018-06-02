@@ -22,6 +22,7 @@ class Selection extends Query implements Iterator, Countable {
     private $iterating = false;
     private $currentIndex = 0;
     private $results = null;
+    private $contains = null;
     
     private $loadReferences = false;
     private $loadDeepReferences = false;
@@ -82,21 +83,35 @@ class Selection extends Query implements Iterator, Countable {
         // WHERE ...
         if ($this->mainWhereGroup !== null) {
             $sql .= ' WHERE ' . (string)$this->mainWhereGroup;
+            
+            if ($this->contains != null) {
+                $primaryFields = $this->oi->getPrimaryFields();
+                $f = $primaryFields[0];
+                $sql .= ' AND '. MyON::escapeField($f) . ' = '. MyON::escapeValue($this->contains->$f) .' ';
+            }
+        } else {
+            if ($this->contains != null) {
+                $primaryFields = $this->oi->getPrimaryFields();
+                $f = $primaryFields[0];
+                $sql .= ' WHERE '. MyON::escapeField($f) . ' = '. MyON::escapeValue($this->contains->$f) .' ';
+            }
         }
         
-        // ORDER BY ...
-        if (count($this->orderRules) !== 0) {
-            $sql .= ' ORDER BY ' . implode(', ', $this->orderRules);
-        }
-        
-        // LIMIT ...
-        if ($this->limit !== false) {
-            $sql .= ' LIMIT ' . $this->limit;
-        }
-        
-        // OFFSET ...
-        if ($this->offset !== false) {
-            $sql .= ' OFFSET '. $this->offset;
+        if ($this->mode != 'count') {
+            // ORDER BY ...
+            if (count($this->orderRules) !== 0) {
+                $sql .= ' ORDER BY ' . implode(', ', $this->orderRules);
+            }
+            
+            // LIMIT ...
+            if ($this->limit !== false) {
+                $sql .= ' LIMIT ' . $this->limit;
+            }
+            
+            // OFFSET ...
+            if ($this->offset !== false) {
+                $sql .= ' OFFSET '. $this->offset;
+            }
         }
         
         return $sql;
@@ -225,16 +240,27 @@ class Selection extends Query implements Iterator, Countable {
         return $ref::select()->where($primary[0], 'in', [$this, $field]);
     }
     
+    public function contains($object) {
+        if (get_class($object) != $this->destinationClass)
+            throw new \Exception('.contains(object): object must be of same class as ::select was called on');
+        
+        $this->contains = $object;
+        $stmt = MyON::getPDO()->query($this->getQuery('count'));
+        $r = $stmt->fetch();
+        $this->contains = null;
+        return $r[0] != 0;
+    }
+    
     /**
      * Performs the query and injects data to DbObject
      *
      * @param bool $loadObjects Whether to store the results as objects
      */
     public function perform($loadObjects = true) {
-        $this->mode = 'select';
         $this->iterating = true;
         $this->results = [];
-        $stmt = MyON::getPDO()->query($this->__toString());
+        
+        $stmt = MyON::getPDO()->query($this->getQuery('select'));
         
         $entries = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
