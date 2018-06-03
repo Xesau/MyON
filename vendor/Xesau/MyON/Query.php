@@ -34,6 +34,53 @@ abstract class Query
         return $continue ? $newGroup : $this;
     }
     
+    public function whereGroup(WhereGroup $group) {
+        if ($this->mainWhereGroup == null) {
+            $this->mainWhereGroup = $group;
+        } else {
+            $this->mainWhereGroup->andGroup($group);
+        }
+        
+        return $this;
+    }
+    
+    public function orWhereGroup(WhereGroup $group) {
+        if ($this->mainWhereGroup == null) {
+            $this->mainWhereGroup = $group;
+        } else {
+            $this->mainWhereGroup->orGroup($group);
+        }
+        
+        return $this;
+    }
+    
+    public function whereNewGroup() {
+        $newMain = new WhereGroup(null, $this, null);
+        if ($this->mainWhereGroup != null) {
+            $newMain->andGroup($this->mainWhereGroup);
+        }
+        $this->mainWhereGroup = $newMain;
+        
+        $g = new WhereGroup(null, $this, $this->mainWhereGroup);
+        $this->mainWhereGroup->andGroup($g);
+        
+        return $g;
+    }
+    
+    public function orWhereNewGroup() {
+        $newMain = new WhereGroup(null, $this, null);
+        if ($this->mainWhereGroup != null) {
+            $newMain->andGroup($this->mainWhereGroup);
+        }
+        $this->mainWhereGroup = $newMain;
+        
+        $g = new WhereGroup(null, $this, $this->mainWhereGroup);
+        $this->mainWhereGroup->orGroup($g);
+        
+        return $g;
+    }
+    
+    
     /**
      * Limits the selection to rows where the given field follows the given condition or the previous condition.
      *
