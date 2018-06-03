@@ -117,7 +117,7 @@ trait DbObject {
         // Make $primaryFields an array
         if (!is_array($primaryFields)) {
             $primaryFields = [$primaryFields];
-        }
+        }        
         
         // If the array is not associative 
         if (array_values($primaryFields) == $primaryFields) {
@@ -138,7 +138,7 @@ trait DbObject {
             if ($curr == $need) {
                 $primFields = $primaryFields;
             } else {
-                throw new InvalidArgumentException('DbObject.byPrim $primaryFields must contain all primary fields.');
+                throw new InvalidArgumentException('DbObject.byPrim associative $primaryFields must contain all primary fields.');
             }
         }
         

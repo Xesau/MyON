@@ -29,7 +29,7 @@ class Where {
         $sqlOp = self::getSqlOperator($this->operator);
         $val = self::getOperatorVal($sqlOp, $this->value);
         if ($val === null)
-            return '1';
+            return '0';
         
         if ($val == 'NULL') {
             if ($sqlOp == '=')

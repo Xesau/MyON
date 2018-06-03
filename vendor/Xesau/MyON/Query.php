@@ -13,7 +13,7 @@ abstract class Query
     protected $limit = false;
 
     /**
-     * Limits the selection to rows where the given field follows the given condition.
+     * Where=( existingRules and (rule...) )
      *
      * @param string|string[] $field    The field that must follow the condition
      * @param string          $operator The operator (=, !=, etc.)
@@ -23,66 +23,17 @@ abstract class Query
      * @return $this|WhereGroup See param $continue
      */
     public function where($field, $operator, $value, $continue = false)
-    {   
-        if ($this->mainWhereGroup == null) {
-            $newGroup = new WhereGroup(new Where($field, $operator, $value), $this);
-            $this->mainWhereGroup = $newGroup;
-        } else {
-            $newGroup = $this->mainWhereGroup->andGroup($field, $operator, $value);
-        }
-
-        return $continue ? $newGroup : $this;
+    {
+        if ($this->mainWhereGroup == null)
+            $this->mainWhereGroup = new WhereGroup(null, $this);
+        
+        $n = new WhereGroup(new Where($field, $operator, $value), $this, null);
+        $this->mainWhereGroup->andGroup($n);
+        return $continue ? $n : $this;
     }
-    
-    public function whereGroup(WhereGroup $group) {
-        if ($this->mainWhereGroup == null) {
-            $this->mainWhereGroup = $group;
-        } else {
-            $this->mainWhereGroup->andGroup($group);
-        }
-        
-        return $this;
-    }
-    
-    public function orWhereGroup(WhereGroup $group) {
-        if ($this->mainWhereGroup == null) {
-            $this->mainWhereGroup = $group;
-        } else {
-            $this->mainWhereGroup->orGroup($group);
-        }
-        
-        return $this;
-    }
-    
-    public function whereNewGroup() {
-        $newMain = new WhereGroup(null, $this, null);
-        if ($this->mainWhereGroup != null) {
-            $newMain->andGroup($this->mainWhereGroup);
-        }
-        $this->mainWhereGroup = $newMain;
-        
-        $g = new WhereGroup(null, $this, $this->mainWhereGroup);
-        $this->mainWhereGroup->andGroup($g);
-        
-        return $g;
-    }
-    
-    public function orWhereNewGroup() {
-        $newMain = new WhereGroup(null, $this, null);
-        if ($this->mainWhereGroup != null) {
-            $newMain->andGroup($this->mainWhereGroup);
-        }
-        $this->mainWhereGroup = $newMain;
-        
-        $g = new WhereGroup(null, $this, $this->mainWhereGroup);
-        $this->mainWhereGroup->orGroup($g);
-        
-        return $g;
-    }
-    
     
     /**
-     * Limits the selection to rows where the given field follows the given condition or the previous condition.
+     * Where=( existingRules or (rule...) )
      *
      * @param string|string[] $field    The field that must follow the condition
      * @param string          $operator The operator (=, !=, etc.)
@@ -93,14 +44,98 @@ abstract class Query
      */
     public function orWhere($field, $operator, $value, $continue = false)
     {
+        if ($this->mainWhereGroup == null)
+            $this->mainWhereGroup = new WhereGroup(null, $this);
+        
+        $n = new WhereGroup(new Where($field, $operator, $value), $this, null);
+        $this->mainWhereGroup->orGroup($n);
+        return $continue ? $n : $this;
+    }
+    
+    /** 
+     * Where=( existingRules or (group) )
+     * @return $this
+     */
+    public function whereGroup(WhereGroup $group) {
         if ($this->mainWhereGroup == null) {
-            $newGroup = new WhereGroup(new Where($field, $operator, $value), $this);
-            $this->mainWhereGroup = $newGroup;
-        } else {
-            $newGroup = $this->mainWhereGroup->orGroup($field, $operator, $value);
+            $this->mainWhereGroup = new WhereGroup(null, $this);
         }
-
-        return $continue ? $newGroup : $this;
+        
+        $this->mainWhereGroup->andGroup($group);
+        
+        return $this;
+    }
+    
+    /**
+     * Where=( existingRules and (group) )
+     * @return $this
+     */
+    public function orWhereGroup(WhereGroup $group) {
+        if ($this->mainWhereGroup == null) {
+            $this->mainWhereGroup = new WhereGroup(null, $this);
+        }
+        
+        $this->mainWhereGroup->orGroup($group);
+        
+        return $this;
+    }
+    
+    /**
+     * Where=( (existingRules) and (new) )
+     * @return WhereGroup the new where group
+     */
+    public function whereNewGroup() {
+        $g = new WhereGroup(null, $this);
+        $this->whereExistingAndGroup($g);
+        return $g;
+    }
+    
+    /**
+     * Where=( (existingRules) or (new) )
+     * @return WhereGroup the new where group
+     */
+    public function orWhereNewGroup() {
+        $g = new WhereGroup(null, $this);
+        $this->whereExistingOrGroup($g);
+        return $g;
+    }
+    
+    /**
+     * Where=( (existingRules) and (group) )
+     * @param WhereGroup $g
+     * @return $this
+     */
+    public function whereExistingAndGroup(WhereGroup $g) {
+        if ($this->mainWhereGroup == null) {
+            $this->mainWhereGroup = $g;
+            return $this;
+        }
+        
+        $main = new WhereGroup(null, $this);
+        $main->andGroup($this->mainWhereGroup);
+        $main->andGroup($g);
+        
+        $this->mainWhereGroup = $main;
+        return $this;
+    }
+    
+    /**
+     * Where=( (existingRules) or (group) )
+     * @param WhereGroup $g
+     * @return $this
+     */
+    public function whereExistingOrGroup(WhereGroup $g) {
+        if ($this->mainWhereGroup == null) {
+            $this->mainWhereGroup = $g;
+            return $this;
+        }
+        
+        $main = new WhereGroup(null, $this);
+        $main->orGroup($this->mainWhereGroup);
+        $main->orGroup($g);
+        
+        $this->mainWhereGroup = $main;
+        return $this;
     }
 
     public function asc($field)

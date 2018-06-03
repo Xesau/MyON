@@ -40,6 +40,7 @@ class WhereGroup {
             $group = new WhereGroup(new Where($fieldOrGroup, $operator, $value), $this->query, $this);
         }
         
+        $group->setParent($this);
 		$this->elements[] = ['and', $group];
 		return $group;
 	}
@@ -51,6 +52,7 @@ class WhereGroup {
             $group = new WhereGroup(new Where($fieldOrGroup, $operator, $value), $this->query, $this);
         }
         
+        $group->setParent($this);
 		$this->elements[] = ['or', $group];
 		return $group;
 	}
@@ -63,6 +65,15 @@ class WhereGroup {
 		}
 	}
 	
+    public function setParent(WhereGroup $g) {
+        $this->parent = $g;
+        $this->query = $g->getQuery();
+    }
+    
+    public function getQuery() {
+        return $this->query;
+    }
+    
 	/**
 	 * Returns the Query
 	 * 
