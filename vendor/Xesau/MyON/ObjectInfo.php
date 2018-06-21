@@ -32,7 +32,7 @@ class ObjectInfo
 			foreach($primaryFields as $v) {
 				if (!is_string($v)) {
 					$primFieldOK = false;
-					break 3;
+					break;
 				}
 			}
 		}
